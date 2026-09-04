@@ -1,10 +1,12 @@
 # DocuMind AI — Enterprise Document Intelligence System
 
+[![Live Frontend](https://img.shields.io/badge/Vite_Frontend-Vercel-000000?style=for-the-badge&logo=vercel)](https://documind-ai.vercel.app)
 [![Live Backend](https://img.shields.io/badge/FastAPI_Backend-Render-009688?style=for-the-badge&logo=render)](https://documind-backend-18y4.onrender.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/harmohini/DocuMind)
 
 ### 🚀 Live Deployment Links
 
+- **React Frontend (Vercel)**: [https://documind-ai.vercel.app](https://documind-ai.vercel.app)
 - **FastAPI Backend (Render)**: [https://documind-backend-18y4.onrender.com](https://documind-backend-18y4.onrender.com)
   - **API Health Check**: [`https://documind-backend-18y4.onrender.com/health`](https://documind-backend-18y4.onrender.com/health)
   - **OpenAPI Swagger Docs**: [`https://documind-backend-18y4.onrender.com/docs`](https://documind-backend-18y4.onrender.com/docs)
@@ -77,13 +79,13 @@ Grounded Answer + Page Citations
 ```
 ┌─────────────────────────────────────────┐
 │     React / TypeScript / Vite UI        │
-│          (http://localhost:8080)        │
+│    (https://documind-ai.vercel.app)     │
 └────────────────────┬────────────────────┘
                      │ HTTP / REST (X-User-ID)
                      ▼
 ┌─────────────────────────────────────────┐
 │         FastAPI Backend Server          │
-│          (http://localhost:8000)        │
+│(https://documind-backend-18y4.onrender.com)│
 └──────┬──────────────┬─────────────┬─────┘
        │              │             │
        ▼              ▼             ▼
@@ -128,95 +130,10 @@ DocuMind/
 │   └── .env.example        # Environment variable configuration template
 ├── package.json
 ├── vite.config.ts
+├── vercel.json
 ├── .gitignore
 └── README.md
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- **Node.js** (v18+) & `npm`
-- **Python** (v3.11+)
-
----
-
-### 1. Backend Setup
-
-Navigate to the `backend/` directory:
-
-```bash
-cd backend
-```
-
-Create and activate a Python virtual environment:
-
-```bash
-python3 -m venv venv
-source venv/bin/activate
-```
-
-Install backend dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-Set up environment variables:
-
-```bash
-cp .env.example .env
-```
-
-Edit `backend/.env` to include your LLM API key:
-
-```env
-LLM_API_KEY=your_openai_api_key_here
-LLM_MODEL=gpt-5.6-luna
-LLM_BASE_URL=https://api.openai.com/v1
-FRONTEND_URL=http://localhost:8080
-CHROMA_PATH=./data/chroma
-DOCUMENTS_DIR=./data/documents
-```
-
-Start the FastAPI backend server:
-
-```bash
-python -m uvicorn app.main:app --reload --port 8000
-```
-
-Verify backend health:
-
-```bash
-curl http://localhost:8000/health
-# Output: {"status":"ok","service":"DocuMind API"}
-```
-
----
-
-### 2. Frontend Setup
-
-In a new terminal window, navigate to the project root:
-
-```bash
-cd /path/to/DocuMind
-```
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the Vite development server:
-
-```bash
-npm run dev
-```
-
-Open your browser to `http://localhost:8080`.
 
 ---
 
