@@ -1,5 +1,17 @@
 # DocuMind AI — Enterprise Document Intelligence System
 
+[![Live Backend](https://img.shields.io/badge/FastAPI_Backend-Render-009688?style=for-the-badge&logo=render)](https://documind-backend-18y4.onrender.com)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/harmohini/DocuMind)
+
+### 🚀 Live Deployment Links
+
+- **FastAPI Backend (Render)**: [https://documind-backend-18y4.onrender.com](https://documind-backend-18y4.onrender.com)
+  - **API Health Check**: [`https://documind-backend-18y4.onrender.com/health`](https://documind-backend-18y4.onrender.com/health)
+  - **OpenAPI Swagger Docs**: [`https://documind-backend-18y4.onrender.com/docs`](https://documind-backend-18y4.onrender.com/docs)
+- **GitHub Repository**: [https://github.com/harmohini/DocuMind](https://github.com/harmohini/DocuMind)
+
+---
+
 DocuMind AI is an AI-powered document intelligence platform designed to ingest, process, index, and analyze complex legal, financial, and technical documents (PDF and DOCX). Powered by a FastAPI backend, ChromaDB vector database, and grounded Retrieval-Augmented Generation (RAG), DocuMind AI enables enterprise users to query document repositories, extract key obligations and risks, generate contract summaries, and produce executive briefs.
 
 ---
