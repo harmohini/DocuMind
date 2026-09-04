@@ -7,7 +7,6 @@
 ### 🚀 Live Deployment Links
 
 - **React Frontend (Vercel)**: [https://docu-mind-gray.vercel.app/dashboard](https://docu-mind-gray.vercel.app/dashboard)
-- **Vercel Project Dashboard**: [https://vercel.com/harmohinis-projects/docu-mind](https://vercel.com/harmohinis-projects/docu-mind)
 - **FastAPI Backend (Render)**: [https://documind-backend-18y4.onrender.com](https://documind-backend-18y4.onrender.com)
   - **API Health Check**: [`https://documind-backend-18y4.onrender.com/health`](https://documind-backend-18y4.onrender.com/health)
   - **OpenAPI Swagger Docs**: [`https://documind-backend-18y4.onrender.com/docs`](https://documind-backend-18y4.onrender.com/docs)
