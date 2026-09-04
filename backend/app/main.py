@@ -99,6 +99,16 @@ async def custom_general_exception_handler(request: Request, exc: Exception):
         }
     )
 
+# Root Endpoint
+@app.get("/", tags=["Root"])
+async def root():
+    return {
+        "status": "ok",
+        "message": "DocuMind AI backend is running",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
 # Register Routers
 app.include_router(health.router)
 app.include_router(documents.router)
