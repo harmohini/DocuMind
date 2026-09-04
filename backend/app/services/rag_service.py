@@ -19,19 +19,25 @@ class RAGService:
         4. Return response text with exact source citations
         """
         # 1. Similarity Search in Vector Store for current user's documents
-        matched_chunks = VectorStoreService.similarity_search(query=prompt, user_id=user_id, document_id=document_id, top_k=4)
+        matched_chunks = VectorStoreService.similarity_search(query=prompt, user_id=user_id, document_id=document_id, top_k=6)
+
+        logger.info(f"RAG QUESTION: '{prompt}' | user_id='{user_id}' | document_id='{document_id}'")
+        logger.info(f"RETRIEVED CHUNKS COUNT: {len(matched_chunks)}")
 
         citations = []
         context_str = ""
 
         if matched_chunks:
             context_pieces = []
-            for chunk in matched_chunks:
+            for i, chunk in enumerate(matched_chunks):
                 doc_name = chunk.get("document_name", "Uploaded Document")
                 page_num = chunk.get("page", 1)
+                chk_idx = chunk.get("chunk_index", i)
                 text_snippet = chunk.get("text", "")
                 
-                context_pieces.append(f"[Document: {doc_name} | Page: {page_num}]\n{text_snippet}")
+                logger.info(f"  Chunk {i+1}: doc='{doc_name}' | page={page_num} | chunk={chk_idx} | preview='{text_snippet[:90]}...'")
+                
+                context_pieces.append(f"[Document: {doc_name} | Page: {page_num} | Chunk: {chk_idx}]\n{text_snippet}")
                 
                 citations.append({
                     "documentId": chunk.get("document_id", document_id or "doc-1"),
@@ -44,17 +50,18 @@ class RAGService:
         else:
             if document_id:
                 doc = DocumentProcessorService.get_document_by_id(document_id, user_id=user_id)
-                if doc:
-                    context_str = f"[Document: {doc['name']} | Page: 1]\n{doc.get('extracted_text', '')[:1500]}"
+                if doc and doc.get("extracted_text"):
+                    extracted = doc["extracted_text"][:2000]
+                    context_str = f"[Document: {doc['name']} | Page: 1]\n{extracted}"
                     citations.append({
                         "documentId": document_id,
                         "documentName": doc["name"],
                         "page": 1,
                         "section": "Page 1",
-                        "snippet": doc.get('extracted_text', '')[:180]
+                        "snippet": extracted[:180]
                     })
 
-        # 2. LLM Provider Execution (gpt-5.6-luna or configured model)
+        # 2. LLM Provider Execution
         llm_response_text = None
         
         if settings.is_llm_configured():
@@ -68,9 +75,9 @@ class RAGService:
                     "model": settings.LLM_MODEL,
                     "messages": [
                         {"role": "system", "content": RAG_SYSTEM_PROMPT},
-                        {"role": "user", "content": RAG_USER_PROMPT.format(context=context_str, question=prompt)}
+                        {"role": "user", "content": RAG_USER_PROMPT.format(context=context_str if context_str else "No matching context found.", question=prompt)}
                     ],
-                    "temperature": 0.2
+                    "temperature": 0.1
                 }
                 endpoint = f"{settings.LLM_BASE_URL.rstrip('/')}/chat/completions"
                 async with httpx.AsyncClient(timeout=30.0) as client:
@@ -78,23 +85,31 @@ class RAGService:
                     if resp.status_code == 200:
                         data = resp.json()
                         llm_response_text = data["choices"][0]["message"]["content"]
+                    else:
+                        logger.error(f"LLM API returned HTTP {resp.status_code}: {resp.text}")
             except Exception as e:
                 logger.error(f"LLM API Call Exception: {str(e)}")
 
-        # 3. Grounded Fallback Response Generator if LLM API Key is unconfigured/unreachable
+        # 3. Grounded Response fallback (strictly NO fake generic answers)
         if not llm_response_text:
             if not context_str or "Empty or non-extractable" in context_str:
                 llm_response_text = "I couldn't find this information in the uploaded documents."
             else:
-                lower = prompt.lower()
-                if "termination" in lower or "notice" in lower or "cancel" in lower:
-                    llm_response_text = f"Based on the uploaded document excerpts, termination conditions require prior written notice (typically 15-30 days) prior to contract anniversary dates as detailed in the source citations."
-                elif "price" in lower or "fee" in lower or "payment" in lower or "cost" in lower:
-                    llm_response_text = f"According to the document text, payment terms specify structured fee obligations and billing terms under Net 30 conditions."
-                elif "risk" in lower or "liability" in lower or "indemni" in lower:
-                    llm_response_text = f"The analysis detected risk clauses related to liability limits and indemnification terms as referenced in the page citations below."
+                import re
+                query_keywords = [
+                    w.lower() for w in re.findall(r'\w+', prompt) 
+                    if len(w) > 2 and w.lower() not in {
+                        "what", "is", "the", "of", "in", "to", "a", "and", "for", "on", 
+                        "who", "are", "how", "many", "tell", "me", "about", "which", "where", "can"
+                    }
+                ]
+                context_lower = context_str.lower()
+                has_keyword_match = any(w in context_lower for w in query_keywords)
+                
+                if query_keywords and not has_keyword_match:
+                    llm_response_text = "I couldn't find this information in the uploaded documents."
                 else:
-                    llm_response_text = f"According to the document text: \"{context_str[:300]}...\""
+                    llm_response_text = f"Based on the uploaded document text:\n\n{context_str[:600]}"
 
         return {
             "id": f"msg-{int(datetime.now().timestamp() * 1000)}",

@@ -1,6 +1,7 @@
 import logging
 import math
 import re
+import hashlib
 from typing import List
 
 logger = logging.getLogger("documind.embeddings")
@@ -8,7 +9,7 @@ logger = logging.getLogger("documind.embeddings")
 def generate_text_embedding(text: str, dimension: int = 384) -> List[float]:
     """
     Generates normalized dense vector embeddings for text.
-    Uses word frequency hashing to generate consistent, deterministic embeddings.
+    Uses md5 hashing to generate 100% deterministic, process-independent embeddings.
     """
     words = re.findall(r'\w+', text.lower())
     vec = [0.0] * dimension
@@ -16,8 +17,9 @@ def generate_text_embedding(text: str, dimension: int = 384) -> List[float]:
         return vec
 
     for word in words:
-        # Hash word into dimension index
-        idx = hash(word) % dimension
+        # Deterministic hashing into dimension index
+        word_hash = int(hashlib.md5(word.encode('utf-8')).hexdigest(), 16)
+        idx = word_hash % dimension
         vec[idx] += 1.0
 
     # L2 normalize
@@ -32,3 +34,4 @@ def generate_batch_embeddings(texts: List[str], dimension: int = 384) -> List[Li
     Batch embedding generation.
     """
     return [generate_text_embedding(t, dimension) for t in texts]
+

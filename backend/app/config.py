@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     LLM_API_KEY: str = "your-api-key-here"
-    LLM_MODEL: str = "gpt-5.6-luna"
+    LLM_MODEL: str = "gpt-4o-mini"
     LLM_BASE_URL: str = "https://api.openai.com/v1"
     FRONTEND_URL: str = "http://localhost:5173"
     CHROMA_PATH: str = "./data/chroma"
