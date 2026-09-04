@@ -24,7 +24,15 @@ class SummarizerService:
 
         doc_name = doc.get("name", "Document.pdf")
         doc_type = (document_type or doc.get("document_type") or "Contract").capitalize()
-        extracted_text = doc.get("extracted_text", "")[:4000]
+        extracted_text = doc.get("extracted_text", "")[:25000]
+        pages_count = doc.get("page_count", 1)
+
+        logger.info(f"SUMMARIZE DOCUMENT ID: {document_id}")
+        logger.info(f"FILENAME: {doc_name}")
+        logger.info(f"EXTRACTED PAGES: {pages_count}")
+        logger.info(f"EXTRACTED TEXT LENGTH: {len(extracted_text)}")
+        logger.info(f"FIRST 300 CHARACTERS: {extracted_text[:300]}")
+        logger.info(f"LAST 300 CHARACTERS: {extracted_text[-300:] if len(extracted_text) > 300 else extracted_text}")
 
         # Select prompt template
         if doc_type == "Policy":
@@ -59,98 +67,72 @@ class SummarizerService:
                         res_data = resp.json()
                         raw_content = res_data["choices"][0]["message"]["content"]
                         summary_json = json.loads(raw_content)
+                    else:
+                        logger.error(f"LLM Summarizer API returned HTTP {resp.status_code}: {resp.text}")
             except Exception as e:
                 logger.error(f"LLM Summarizer API error: {str(e)}")
 
-        # Fallback structured JSON if LLM API is unconfigured
+        # Grounded structured response when LLM API is unconfigured/unreachable (NO fake generic fallbacks)
         if not summary_json:
+            import re
+            
+            # Rule-based fallback extraction from extracted_text
+            dur_match = re.search(r'(\d+\s*(?:years?|months?))', extracted_text, re.IGNORECASE)
+            dur_str = dur_match.group(1).title() if dur_match else "Not specified in the document"
+            
+            pay_match = re.search(r'(net\s*\d+|payable\s*[^.\n]+)', extracted_text, re.IGNORECASE)
+            pay_str = pay_match.group(1).title() if pay_match else "Not specified in the document"
+
+            law_match = re.search(r'(laws?\s+of\s+[^.\n,]+)', extracted_text, re.IGNORECASE)
+            law_str = law_match.group(1).title() if law_match else "Not specified in the document"
+
+            party_match = re.search(r'between\s+([^.\n]+?)\s+and\s+([^.\n]+?)(?:\s+on|\s+dated|\.|\n)', extracted_text, re.IGNORECASE)
+            org_str = party_match.group(1).strip() if party_match else "Not specified in the document"
+            ven_str = party_match.group(2).strip() if party_match else "Not specified in the document"
+
             if doc_type == "Policy":
                 summary_json = {
-                    "summary": f"This policy outlines operational governance, data security standards, and compliance rules for {doc_name}. It establishes mandatory employee guidelines and violation remediation workflows.",
-                    "purpose": "Define governance rules and data security standards across all business units.",
-                    "scope": "All full-time employees, contractors, and third-party vendors.",
-                    "rules": ["Mandatory multi-factor authentication", "Annual security policy acknowledgment", "Data encryption at rest"],
-                    "responsibilities": ["IT Security Team: Monitor compliance", "Employees: Complete mandatory annual training"],
-                    "exceptions": ["Approved temporary waivers issued by Chief Information Security Officer"],
-                    "complianceRequirements": ["ISO 27001", "SOC2 Type II Audit Standards"],
-                    "importantPoints": ["Immediate incident reporting required within 2 hours of discovery"]
+                    "summary": f"Summary for {doc_name}. Extracted {len(extracted_text)} characters from document.",
+                    "purpose": "Not specified in the document",
+                    "scope": "Not specified in the document",
+                    "rules": [],
+                    "responsibilities": [],
+                    "exceptions": [],
+                    "complianceRequirements": [],
+                    "importantPoints": []
                 }
             elif doc_type == "Report":
                 summary_json = {
-                    "summary": f"Executive report summary analyzing performance metrics, financial variance, and strategic key findings contained within {doc_name}.",
-                    "executiveOverview": f"Analysis of enterprise key performance indicators and operational milestones for {doc_name}.",
-                    "objectives": ["Evaluate Q3 operational efficiency", "Identify cost optimization targets"],
-                    "keyFindings": ["Operational uptime reached 99.94%", "Cloud infrastructure expenditure increased 12% YoY"],
-                    "importantMetrics": ["System SLA Uptime: 99.94%", "Annual Budget Variance: +4.2%"],
-                    "conclusions": ["Current operational trajectory remains strong with manageable cost variance."],
-                    "recommendations": ["Optimize cloud instance reserved pricing", "Schedule quarterly review"]
+                    "summary": f"Summary for {doc_name}. Extracted {len(extracted_text)} characters from document.",
+                    "executiveOverview": f"Overview for {doc_name}.",
+                    "objectives": [],
+                    "keyFindings": [],
+                    "importantMetrics": [],
+                    "conclusions": [],
+                    "recommendations": []
                 }
             else:  # Contract
                 summary_json = {
-                    "summary": f"This agreement establishes contractual terms for {doc_name}. It spans mandatory operational terms with renewal clauses, fee billing obligations, SLA uptime guarantees, and liability terms.",
-                    "contractValue": "₹18,50,000",
-                    "duration": "2 Years",
-                    "startDate": "12 January 2026",
-                    "expiryDate": "11 January 2028",
-                    "renewalType": "Automatic",
+                    "summary": f"Contract summary for {doc_name}. Extracted {len(extracted_text)} characters.",
+                    "contractValue": "Not specified in the document",
+                    "duration": dur_str,
+                    "startDate": "Not specified in the document",
+                    "expiryDate": "Not specified in the document",
+                    "renewalType": "Not specified in the document",
                     "parties": {
-                        "organization": "Fintrust Technologies Inc.",
-                        "vendor": "CloudScale Infrastructure Services Pvt Ltd"
+                        "organization": org_str,
+                        "vendor": ven_str
                     },
-                    "paymentTerms": "Net 30",
-                    "terminationNotice": "30 Days",
-                    "governingLaw": "High Court of Karnataka, India",
-                    "clauses": [
-                        {
-                            "id": "cl-1",
-                            "name": "Confidentiality & NDA",
-                            "status": "Identified",
-                            "explanation": "Mutual 5-year post-termination confidentiality clause covering proprietary code and architecture.",
-                            "sourcePage": 1,
-                            "relevantSection": "Section 5.1",
-                            "snippet": "Each party agrees to hold in confidence all proprietary data shared during the Term for 5 years."
-                        },
-                        {
-                            "id": "cl-2",
-                            "name": "Termination Rights",
-                            "status": "Identified",
-                            "explanation": "Permits termination without cause upon 15 business days notice.",
-                            "sourcePage": 2,
-                            "relevantSection": "Section 14.3",
-                            "snippet": "Either party may terminate this agreement without cause upon providing 15 business days written notice."
-                        }
-                    ],
-                    "obligations": [
-                        {
-                            "id": "ob-1",
-                            "party": "Finance Team",
-                            "obligation": "Process quarterly vendor invoices under Net 30 terms.",
-                            "frequency": "Quarterly",
-                            "deadline": "30 Days from Invoice",
-                            "status": "Active"
-                        }
-                    ],
-                    "importantDates": [
-                        {
-                            "id": "dt-1",
-                            "title": "Contract Effective Date",
-                            "date": "12 Jan 2026",
-                            "type": "Start",
-                            "description": "Agreement signed and active."
-                        }
-                    ],
-                    "risks": [
-                        {
-                            "id": "cr-1",
-                            "severity": "HIGH",
-                            "title": "Uncapped Liability Exposure",
-                            "explanation": "The agreement lacks an aggregate monetary cap for sub-contractor data breach claims.",
-                            "sourcePage": 1,
-                            "section": "Section 11.2",
-                            "recommendation": "Negotiate aggregate cap equal to 2x annual contract fees."
-                        }
-                    ]
+                    "paymentTerms": pay_str,
+                    "terminationNotice": "Not specified in the document",
+                    "governingLaw": law_str,
+                    "clauses": [],
+                    "obligations": [],
+                    "importantDates": [],
+                    "risks": []
                 }
+
+        logger.info(f"ANALYSIS RESULT (Summarizer): {json.dumps(summary_json)[:300]}...")
 
         return {
             "success": True,
