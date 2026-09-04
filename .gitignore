@@ -2,10 +2,11 @@
 node_modules/
 .pnpm-store/
 
-# Production build outputs
+# Production build outputs & deployment artifacts
 dist/
 dist-ssr/
 build/
+.vercel/
 
 # Environment configuration & secrets
 .env
