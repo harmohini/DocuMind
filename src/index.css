@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-primary: #F8F6F1;
+    --bg-secondary: #F1EDE5;
+    --card-bg: #FFFFFF;
+    --border-color: #E4DED4;
+    --text-primary: #242321;
+    --text-secondary: #6F6A62;
+    --text-muted: #9A948A;
+    --accent-warm: #8B7355;
+    --accent-dark: #5F4B35;
+  }
+
+  body {
+    background-color: #F8F6F1;
+    color: #242321;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  }
+}
+
+/* Custom warm scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1EDE5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D5CDC0;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8AC99;
+}
+
+/* Smooth page transitions */
+.fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
