@@ -1,12 +1,12 @@
 # DocuMind AI — Enterprise Document Intelligence System
 
-[![Live Frontend](https://img.shields.io/badge/Vite_Frontend-Vercel-000000?style=for-the-badge&logo=vercel)](https://documind-ai.vercel.app)
+[![Live Frontend](https://img.shields.io/badge/Vite_Frontend-Vercel-000000?style=for-the-badge&logo=vercel)](https://docu-mind.vercel.app)
 [![Live Backend](https://img.shields.io/badge/FastAPI_Backend-Render-009688?style=for-the-badge&logo=render)](https://documind-backend-18y4.onrender.com)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/harmohini/DocuMind)
 
 ### 🚀 Live Deployment Links
 
-- **React Frontend (Vercel)**: [https://documind-ai.vercel.app](https://documind-ai.vercel.app)
+- **React Frontend (Vercel)**: [https://docu-mind.vercel.app](https://docu-mind.vercel.app) ([Vercel Project Dashboard](https://vercel.com/harmohinis-projects/docu-mind))
 - **FastAPI Backend (Render)**: [https://documind-backend-18y4.onrender.com](https://documind-backend-18y4.onrender.com)
   - **API Health Check**: [`https://documind-backend-18y4.onrender.com/health`](https://documind-backend-18y4.onrender.com/health)
   - **OpenAPI Swagger Docs**: [`https://documind-backend-18y4.onrender.com/docs`](https://documind-backend-18y4.onrender.com/docs)
@@ -79,7 +79,7 @@ Grounded Answer + Page Citations
 ```
 ┌─────────────────────────────────────────┐
 │     React / TypeScript / Vite UI        │
-│    (https://documind-ai.vercel.app)     │
+│      (https://docu-mind.vercel.app)     │
 └────────────────────┬────────────────────┘
                      │ HTTP / REST (X-User-ID)
                      ▼
