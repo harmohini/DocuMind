@@ -164,3 +164,77 @@ export interface ChatMessage {
     snippet: string;
   }[];
 }
+
+export interface ContractClause {
+  id?: string;
+  name?: string;
+  title?: string;
+  status?: string;
+  explanation?: string;
+  description?: string;
+  text?: string;
+  sourcePage?: number;
+  page?: number;
+  relevantSection?: string;
+  section?: string;
+  snippet?: string;
+  type?: string;
+}
+
+export interface ContractObligation {
+  id?: string;
+  party?: string;
+  obligation?: string;
+  description?: string;
+  frequency?: string;
+  deadline?: string;
+  status?: string;
+}
+
+export interface ContractDate {
+  id?: string;
+  title?: string;
+  date?: string;
+  type?: string;
+  description?: string;
+}
+
+export interface ContractRisk {
+  id?: string;
+  severity?: RiskLevel | string;
+  title?: string;
+  name?: string;
+  explanation?: string;
+  description?: string;
+  sourcePage?: number;
+  page?: number;
+  section?: string;
+  recommendation?: string;
+}
+
+export interface ContractItem {
+  id: string;
+  name: string;
+  type: string;
+  pages: number;
+  analyzedAt: string;
+  contractValue: string;
+  duration: string;
+  startDate: string;
+  expiryDate: string;
+  renewalType: string;
+  riskScore: number;
+  parties: {
+    organization: string;
+    vendor: string;
+  };
+  paymentTerms: string;
+  terminationNotice: string;
+  governingLaw: string;
+  summary: string;
+  clauses: ContractClause[];
+  obligations: ContractObligation[];
+  importantDates: ContractDate[];
+  risks: ContractRisk[];
+}
+

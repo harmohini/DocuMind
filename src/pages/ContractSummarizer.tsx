@@ -19,7 +19,7 @@ import {
   FolderOpen
 } from 'lucide-react';
 import { contractService } from '../services/contractService';
-import type { ContractItem, ContractClause } from '../data/contracts';
+import type { ContractItem, ContractClause, ContractObligation, ContractDate, ContractRisk } from '../types';
 import { toast } from 'sonner';
 
 export const ContractSummarizer: React.FC = () => {
@@ -380,7 +380,7 @@ export const ContractSummarizer: React.FC = () => {
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {selectedContract.clauses.map((clause) => (
+                    {selectedContract.clauses.map((clause: ContractClause) => (
                       <div
                         key={clause.id}
                         onClick={() => setSelectedClause(clause)}
@@ -422,7 +422,7 @@ export const ContractSummarizer: React.FC = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#E4DED4]/60">
-                        {selectedContract.obligations.map((ob) => (
+                        {selectedContract.obligations.map((ob: ContractObligation) => (
                           <tr key={ob.id} className="hover:bg-[#FAF8F5] cursor-pointer">
                             <td className="py-2.5 pl-2 font-bold text-[#242321]">{ob.party}</td>
                             <td className="py-2.5 text-[#6F6A62]">{ob.obligation}</td>
@@ -449,7 +449,7 @@ export const ContractSummarizer: React.FC = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {selectedContract.importantDates.map((dt) => (
+                    {selectedContract.importantDates.map((dt: ContractDate) => (
                       <div
                         key={dt.id}
                         className="p-3.5 rounded-xl border border-[#E4DED4] bg-[#FAF8F5] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -465,7 +465,7 @@ export const ContractSummarizer: React.FC = () => {
                         </div>
 
                         <button
-                          onClick={() => handleAddDeadline(dt.title, dt.date)}
+                          onClick={() => handleAddDeadline(dt.title || 'Important Date', dt.date || 'TBD')}
                           className="text-xs font-semibold text-[#8B7355] hover:text-[#5F4B35] bg-white border border-[#E4DED4] px-3 py-1.5 rounded-xl self-start sm:self-auto transition"
                         >
                           + Add to Deadlines
@@ -484,7 +484,7 @@ export const ContractSummarizer: React.FC = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {selectedContract.risks.map((risk) => (
+                    {selectedContract.risks.map((risk: ContractRisk) => (
                       <div
                         key={risk.id}
                         onClick={() => navigate('/risks')}

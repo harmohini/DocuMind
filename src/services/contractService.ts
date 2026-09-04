@@ -1,4 +1,4 @@
-import type { ContractItem } from '../data/contracts';
+import type { ContractItem } from '../types';
 import { documentService } from './documentService';
 import { fetchWithAuth } from './apiClient';
 import { deadlineService } from './deadlineService';
